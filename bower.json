@@ -11,6 +11,6 @@
     "README.md"
   ],
   "dependencies": {
-    "snapjs": "1.x"
+    "snapjs": "latest"
   }
 }
