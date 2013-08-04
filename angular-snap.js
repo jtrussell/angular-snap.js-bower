@@ -3,13 +3,17 @@ angular.module('snap', []);
 angular.module('snap')
   .directive('snapClose', function() {
     'use strict';
-    return function (scope, element, attrs) {
-      element.bind('click', function() {
-        if (scope.snapper !== undefined) {
-          scope.snapper.close();
-        }
-      });
+    return {
+      restrict: 'A',
+      link: function (scope, element, attrs) {
+        element.bind('click', function() {
+          if (scope.snapper !== undefined) {
+            scope.snapper.close();
+          }
+        });
+      }
     };
+    
   });
 
 angular.module('snap')
@@ -19,6 +23,7 @@ angular.module('snap')
       template: '<div class="snap-content" ng-transclude></div>',
       transclude: true,
       replace: true,
+      restrict: 'AE',
       link: function postLink(scope, element, attrs) {
 
         // Find the shelves and set `minPosition`/`maxPosition` if they have
@@ -65,6 +70,7 @@ angular.module('snap')
       template: '<div class="snap-drawer" ng-transclude></div>',
       transclude: true,
       replace: true,
+      restrict: 'AE',
       link: function(scope, element, attrs) {
 
         // Don't force a `snap-drawers` wrapper when we only want to use a
@@ -102,6 +108,7 @@ angular.module('snap')
     return {
       transclude: true,
       replace: true,
+      restrict: 'AE',
       template: '<div class="snap-drawers" ng-transclude></div>'
     };
   });
@@ -109,15 +116,18 @@ angular.module('snap')
 angular.module('snap')
   .directive('snapToggle', function() {
       'use strict';
-      return function (scope, element, attrs) {
-        element.bind('click', function() {
-            if (scope.snapper !== undefined) {
-              if (attrs.snapToggle) {
-                scope.snapper.toggle(attrs.snapToggle);
-              } else {
-                scope.snapper.toggle('left');
+      return {
+        restrict: 'A',
+        link: function (scope, element, attrs) {
+          element.bind('click', function() {
+              if (scope.snapper !== undefined) {
+                if (attrs.snapToggle) {
+                  scope.snapper.toggle(attrs.snapToggle);
+                } else {
+                  scope.snapper.toggle('left');
+                }
               }
-            }
-        });
+          });
+        }
       };
   });
