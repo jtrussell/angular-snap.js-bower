@@ -1,23 +1,22 @@
 angular.module('snap', []);
 
 angular.module('snap')
-  .directive('snapClose', function() {
+  .directive('snapClose', ['$rootScope', 'snapRemote', function($rootScope, snapRemote) {
     'use strict';
     return {
       restrict: 'A',
       link: function (scope, element, attrs) {
         element.bind('click', function() {
-          if (scope.snapper !== undefined) {
-            scope.snapper.close();
-          }
+          // Wrap in anonymous function for easier testing
+          snapRemote.close();
+          $rootScope.$digest();
         });
       }
     };
-    
-  });
+  }]);
 
 angular.module('snap')
-  .directive('snapContent', [function () {
+  .directive('snapContent', ['snapRemote', function (snapRemote) {
     'use strict';
     return {
       template: '<div class="snap-content" ng-transclude></div>',
@@ -25,14 +24,6 @@ angular.module('snap')
       replace: true,
       restrict: 'AE',
       link: function postLink(scope, element, attrs) {
-
-        // Find the shelves and set `minPosition`/`maxPosition` if they have
-        // non-default widths
-        // ...
-
-        // Do we have a just a single left/right shelf? Disable the other side
-        // ...
-
         var snapOptions = {
           element: element[0]
         };
@@ -42,21 +33,14 @@ angular.module('snap')
           angular.extend(snapOptions, scope.$eval(attrs.snapOptions));
         }
 
-        var snapper = new window.Snap(snapOptions);
-
-        // add toggle method
-        snapper.toggle = function(target) {
-          var method = (snapper.state().state === target)?'close':'open';
-          snapper[method](target);
-        };
-
-        // publish to the scope so we have all builtin methods available in ng-click
-        scope.snapper = snapper;
+        snapRemote.register(new window.Snap(snapOptions));
 
         // watch snapOptions for updates
         if(angular.isDefined(attrs.snapOptions) && attrs.snapOptions) {
           scope.$watch(attrs.snapOptions, function(newSnapOptions) {
-            snapper.settings(newSnapOptions);
+            snapRemote.getSnapper().then(function(snapper) {
+              snapper.settings(newSnapOptions);
+            });
           }, true);
         }
       }
@@ -95,9 +79,6 @@ angular.module('snap')
           element.wrap('<div class="snap-drawers" />');
         }
 
-        // Get the width of element[0] and apply it to the shelf
-        // ...
-
       }
     };
   });
@@ -114,20 +95,88 @@ angular.module('snap')
   });
 
 angular.module('snap')
-  .directive('snapToggle', function() {
+  .directive('snapToggle', ['$rootScope', 'snapRemote', function($rootScope, snapRemote) {
       'use strict';
       return {
         restrict: 'A',
         link: function (scope, element, attrs) {
           element.bind('click', function() {
-              if (scope.snapper !== undefined) {
-                if (attrs.snapToggle) {
-                  scope.snapper.toggle(attrs.snapToggle);
-                } else {
-                  scope.snapper.toggle('left');
-                }
-              }
+            if (attrs.snapToggle) {
+              snapRemote.toggle(attrs.snapToggle);
+            } else {
+              snapRemote.toggle('left');
+            }
+            $rootScope.$digest();
           });
         }
       };
-  });
+  }]);
+
+angular.module('snap')
+  .factory('snapRemote', ['$q', function($q) {
+    'use strict';
+
+    var snapperStore = {}
+      , DEFAULT_SNAPPER_ID = '__DEFAULT_SNAPPER_ID__'
+      , exports = {}
+      , initStoreForId
+      , resolveInStoreById;
+
+    exports.getSnapper = function(id) {
+      id = id || DEFAULT_SNAPPER_ID;
+      if(!snapperStore.hasOwnProperty(id)) {
+        initStoreForId(id);
+      }
+      return snapperStore[id].deferred.promise;
+    };
+
+    exports.register = function(snapper, id) {
+      id = id || DEFAULT_SNAPPER_ID;
+      if(!snapperStore.hasOwnProperty(id)) {
+        initStoreForId(id);
+      }
+      if(snapperStore[id].isResolved) {
+        initStoreForId(id);
+      }
+      resolveInStoreById(snapper, id);
+    };
+
+    exports.toggle = function(side, id) {
+      id = id || DEFAULT_SNAPPER_ID;
+      exports.getSnapper().then(function(snapper) {
+        if(side === snapper.state().state) {
+          exports.close(side);
+        } else {
+          exports.open(side);
+        }
+      });
+    };
+
+    exports.open = function(side, id) {
+      id = id || DEFAULT_SNAPPER_ID;
+      exports.getSnapper().then(function(snapper) {
+        snapper.open(side);
+      });
+    };
+
+    exports.close = function(id) {
+      id = id || DEFAULT_SNAPPER_ID;
+      exports.getSnapper().then(function(snapper) {
+        snapper.close();
+      });
+    };
+
+    initStoreForId = function(id) {
+      snapperStore[id] = {
+        deferred: $q.defer(),
+        isResolved: false
+      };
+    };
+
+    resolveInStoreById = function(snapper, id) {
+      snapperStore[id].deferred.resolve(snapper);
+      snapperStore[id].isResolved = true;
+    };
+
+    return exports;
+  }]);
