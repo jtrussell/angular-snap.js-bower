@@ -42,6 +42,10 @@ angular.module('snap')
             });
           }, true);
         }
+
+        scope.$on('$destroy', function() {
+          snapRemote.unregister();
+        });
       }
     };
   }]);
@@ -137,6 +141,13 @@ angular.module('snap')
         initStoreForId(id);
       }
       resolveInStoreById(snapper, id);
+    };
+
+    exports.unregister = function(id) {
+      id = id || DEFAULT_SNAPPER_ID;
+      if(snapperStore.hasOwnProperty(id)) {
+        delete snapperStore[id];
+      }
     };
 
     exports.toggle = function(side, id) {
