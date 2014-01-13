@@ -44,7 +44,7 @@ angular.module('snap')
         // watch snapOptions for updates
         if(angular.isDefined(attrs.snapOptions) && attrs.snapOptions) {
           scope.$watch(attrs.snapOptions, function(newSnapOptions) {
-            snapRemote.getSnapper().then(function(snapper) {
+            snapRemote.getSnapper(snapId).then(function(snapper) {
               snapper.settings(newSnapOptions);
             });
           }, true);
@@ -56,6 +56,23 @@ angular.module('snap')
       }
     };
   }]);
+
+angular.module('snap')
+  .directive('snapDragger', ['snapRemote', function(snapRemote) {
+    'use strict';
+    return {
+      restrict: 'AE',
+      link: function(scope, element, attrs) {
+        var snapId = scope.$eval(attrs.snapId);
+        snapRemote.getSnapper(snapId).then(function(snapper) {
+          snapper.settings({
+            dragger: element[0]
+          });
+        });
+      }
+    };
+  }]);
+
 
 angular.module('snap')
   .directive('snapDrawer', function () {
