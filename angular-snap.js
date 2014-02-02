@@ -2,7 +2,7 @@ angular.module('snap', []);
 
 (function() {
   'use strict';
-  var version = [1, 3, 4]
+  var version = [1, 3, 5]
     , vObj = {
         full: version.join('.'),
         major: version[0],
@@ -158,7 +158,8 @@ angular.module('snap')
   'use strict';
 
   // Global Snap.js options
-  var opts = this.globalOptions = {};
+  var self = this;
+  this.globalOptions = {};
 
   this.$get = ['$q', function($q) {
 
@@ -168,7 +169,7 @@ angular.module('snap')
       , initStoreForId
       , resolveInStoreById;
 
-    exports.globalOptions = opts;
+    exports.globalOptions = self.globalOptions;
 
     exports.getSnapper = function(id) {
       id = id || DEFAULT_SNAPPER_ID;
