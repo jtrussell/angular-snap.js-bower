@@ -2,7 +2,7 @@ angular.module('snap', []);
 
 (function() {
   'use strict';
-  var version = [1, 4, 0]
+  var version = [1, 4, 1]
     , vObj = {
         full: version.join('.'),
         major: version[0],
@@ -125,7 +125,7 @@ angular.module('snap')
     'use strict';
     return {
       restrict: 'AE',
-      link: function(scope, element, attrs) {
+      compile: function(element, attrs) {
         element.addClass('snap-drawers');
       }
     };
