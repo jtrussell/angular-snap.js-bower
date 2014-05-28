@@ -2,7 +2,7 @@ angular.module('snap', []);
 
 (function() {
   'use strict';
-  var version = [1, 4, 1]
+  var version = [1, 5, 0]
     , vObj = {
         full: version.join('.'),
         major: version[0],
@@ -28,7 +28,7 @@ angular.module('snap')
   }]);
 
 angular.module('snap')
-  .directive('snapContent', ['snapRemote', function (snapRemote) {
+  .directive('snapContent', ['SnapConstructor', 'snapRemote', function (SnapConstructor, snapRemote) {
     'use strict';
     return {
       restrict: 'AE',
@@ -51,7 +51,7 @@ angular.module('snap')
           angular.extend(snapOptions, scope.$eval(attrs.snapOptions));
         }
 
-        snapRemote.register(new window.Snap(snapOptions), snapId);
+        snapRemote.register(new SnapConstructor(snapOptions), snapId);
 
         // watch snapOptions for updates
         if(angular.isDefined(attrs.snapOptions) && attrs.snapOptions) {
@@ -152,6 +152,21 @@ angular.module('snap')
         }
       };
   }]);
+
+angular.module('snap')
+.provider('SnapConstructor', function() {
+  'use strict';
+  var constructor = window.Snap;
+
+  this.use = function(Snap) {
+    constructor = Snap;
+  };
+
+  this.$get = function() {
+    return constructor;
+  };
+});
+
 
 angular.module('snap')
 .provider('snapRemote', function SnapRemoteProvider() {
