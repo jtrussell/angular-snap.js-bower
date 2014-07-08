@@ -2,7 +2,7 @@ angular.module('snap', []);
 
 (function() {
   'use strict';
-  var version = [1, 5, 1]
+  var version = [1, 5, 4]
     , vObj = {
         full: version.join('.'),
         major: version[0],
