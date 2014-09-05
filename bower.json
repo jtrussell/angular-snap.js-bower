@@ -1,6 +1,6 @@
 {
   "name": "angular-snap",
-  "version": "1.5.4",
+  "version": "1.6.0",
   "main": [
     "angular-snap.js",
     "angular-snap.css"

@@ -2,7 +2,7 @@ angular.module('snap', []);
 
 (function() {
   'use strict';
-  var version = [1, 5, 4]
+  var version = [1, 6, 0]
     , vObj = {
         full: version.join('.'),
         major: version[0],
@@ -269,6 +269,13 @@ angular.module('snap')
       id = id || DEFAULT_SNAPPER_ID;
       exports.getSnapper(id).then(function(snapper) {
         snapper.close();
+      });
+    };
+
+    exports.expand = function(side, id) {
+      id = id || DEFAULT_SNAPPER_ID;
+      exports.getSnapper(id).then(function(snapper) {
+        snapper.expand(side);
       });
     };
 
