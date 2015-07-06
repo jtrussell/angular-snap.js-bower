@@ -1,6 +1,8 @@
 {
   "name": "angular-snap",
-  "version": "1.8.2",
+  "version": "1.8.3",
+  "author": "jtrussell",
+  "license": "MIT",
   "main": [
     "angular-snap.js",
     "angular-snap.css"
