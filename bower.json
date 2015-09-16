@@ -1,6 +1,6 @@
 {
   "name": "angular-snap",
-  "version": "1.8.3",
+  "version": "1.8.4",
   "author": "jtrussell",
   "license": "MIT",
   "main": [
@@ -11,7 +11,7 @@
     "README.md"
   ],
   "dependencies": {
-    "angular": "~1.2",
+    "angular": "1.4.x || 1.2.x",
     "snapjs": "~1.9"
   }
 }
