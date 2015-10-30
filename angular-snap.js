@@ -2,7 +2,7 @@ angular.module('snap', []);
 
 (function() {
   'use strict';
-  var version = [1, 8, 4]
+  var version = [1, 8, 5]
     , vObj = {
         full: version.join('.'),
         major: version[0],
@@ -218,15 +218,21 @@ angular.module('snap')
 angular.module('snap')
 .provider('SnapConstructor', function() {
   'use strict';
-  var constructor = window.Snap;
+  var constructor;
 
-  this.use = function(Snap) {
-    constructor = Snap;
+  this.use = function(MySnap) {
+    constructor = MySnap;
   };
 
-  this.$get = function() {
-    return constructor;
-  };
+  this.$get = ['$window', function($window) {
+    var S = constructor || $window.Snap;
+    if(angular.isUndefined(S)) {
+      throw new Error('Snap constructor is not defined. Make sure ' +
+          'window.Snap is defined or supply your own with ' +
+          'SnapConstructorProvider.use(MySnap).');
+    }
+    return S;
+  }];
 });
 
 
